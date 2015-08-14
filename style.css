@@ -1,0 +1,89 @@
+body {
+  font-family: sans-serif;
+}
+
+.calendarati {
+  margin-left: 5px;
+  width: 30%;
+  border: 1px solid #000;
+  padding: 10px 171px 5px 0px;
+  height: 165px;
+}
+
+.calendarati-left-section {
+  float: left;
+}
+
+.calendarati-right-section {
+  float: right;
+  position: relative;
+  left: 152px;
+  width: 280px;
+}
+
+.calendarati-top-section {
+  margin-left: 7px;
+}
+
+.calendarati-month {
+  margin-left: 10px;
+  position: relative;
+  left: 90px;
+}
+
+.calendarati-year {
+  margin-left: 10px;
+  position: relative;
+  left: 85px;
+}
+
+.calendarati-right-arrow {
+  margin-left: 10px;
+  float: right;
+}
+
+.calendarati-left-arrow {
+  margin-left: 10px;
+  float: left;
+  left: 8px;
+}
+
+.calendarati-right-arrow:hover, .calendarati-left-arrow:hover, .calendarati-day {
+  cursor: pointer;
+}
+
+.calendarati-bottom-section {
+  width: 50px;
+}
+
+.calendarati-days {
+  width: 300px;
+}
+
+.calendarati-day {
+  text-align: center;
+  font-size: 14px;
+}
+
+.date-top-section {
+  position: relative;
+  left: 100px;
+}
+
+.date-bottom-section {
+  position: relative;
+  top: 22px;
+  left: 67px;
+  font-size: 105px;
+  font-family: sans-serif;
+}
+
+.inline {
+  display: inline;
+}
+
+.group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
