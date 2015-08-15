@@ -196,13 +196,16 @@ theCal.cal = function(element) {
   var cal = document.querySelector('.calendarati');
   cal.addEventListener('click', eventDelegate);
 
+  // Handle key presses, delegates to handler
   document.onkeydown = function(event) {
     event = event || window.event;
 
     switch(event.keyCode) {
+      case 74:
       case 37: // Left
         leftArrowMovement();
         break;
+      case 76:
       case 39: // Right
         rightArrowMovement();
         break;

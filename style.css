@@ -48,8 +48,13 @@ body {
   left: 8px;
 }
 
-.calendarati-right-arrow:hover, .calendarati-left-arrow:hover, .calendarati-day {
+.calendarati-right-arrow:hover, .calendarati-left-arrow:hover {
   cursor: pointer;
+}
+
+.calendarati-day:hover {
+  cursor: pointer;
+  background-color: rgba(255,0,0,0.1);
 }
 
 .calendarati-bottom-section {
@@ -83,6 +88,10 @@ body {
 }
 
 .active {
+  background-color: red;
+}
+
+.active:hover {
   background-color: red;
 }
 

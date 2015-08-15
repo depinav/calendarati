@@ -1,0 +1,6 @@
+{
+  "name": "calendarati",
+  "root": "./",
+  "clean_urls": true,
+  "error_page": "error.html"
+}
