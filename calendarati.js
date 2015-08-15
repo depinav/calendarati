@@ -1,3 +1,5 @@
+// TODO: Make vars more distinct, better names!
+
 var calendarati = (function() {
   var MONTHS = [
     'January',
@@ -23,15 +25,16 @@ var calendarati = (function() {
     'Saturday'
   ],
   theCal = {
-    date: {}
-  };
+    currentDate: {}
+  },
+  tempDate = new Date();
 
-  theCal.date = new Date();
+  theCal.currentDate = new Date();
 
-  var buildCalendar = function(date) {
-    var year = date.getFullYear(),
-        month = MONTHS[date.getMonth()],
-        days = buildDays(date.getMonth(), year),
+  var buildCalendar = function(_date) {
+    var currentFullYear = _date.getFullYear(),
+        currentMonth = MONTHS[_date.getMonth()],
+        daysOfMonth = buildDays(_date.getMonth(), currentFullYear),
         calEl = document.createElement('div'),
         yearEl = document.createElement('div'),
         monthEl = document.createElement('div'),
@@ -49,9 +52,9 @@ var calendarati = (function() {
     topSectionEl.setAttribute('class', 'calendarati-top-section');
     bottomSectionEl.setAttribute('class', 'calendarati-bottom-section');
 
-    yearEl.appendChild(document.createTextNode(year));
-    monthEl.appendChild(document.createTextNode(month));
-    daysEl.appendChild(days);
+    yearEl.appendChild(document.createTextNode(currentFullYear));
+    monthEl.appendChild(document.createTextNode(currentMonth));
+    daysEl.appendChild(daysOfMonth);
     leftArrowEl.appendChild(document.createTextNode('<'));
     rightArrowEl.appendChild(document.createTextNode('>'));
 
@@ -59,7 +62,7 @@ var calendarati = (function() {
     topSectionEl.appendChild(monthEl);
     topSectionEl.appendChild(yearEl);
     topSectionEl.appendChild(rightArrowEl);
-    bottomSectionEl.appendChild(days);
+    bottomSectionEl.appendChild(daysOfMonth);
 
     calEl.appendChild(topSectionEl);
     calEl.appendChild(bottomSectionEl);
@@ -68,8 +71,6 @@ var calendarati = (function() {
   }
 
   var buildDateSection = function(date) {
-    // TODO: I need the day of the week
-    // TODO: I need the day of the month
     var day = DAYS[date.getDay()],
         theDate = date.getDate(),
         dayEl = document.createElement('div'),
@@ -109,15 +110,11 @@ var calendarati = (function() {
   */
 
   var buildDays = function(month, year) {
-    var date = new Date(year, month, 1),
-        days = document.createElement('table');
+// TODO: Add active class to currently seclected day
+    var dateBasedOnMonthYear = new Date(year, month, 1),
+        daysOfMonth = document.createElement('table');
 
-    days.addEventListener('click', function(event, target) {
-      var target = event.target || event.srcElement
-      console.log('hello');
-      stopPropagation(event);
-    });
-    days.className = 'calendarati-days';
+    daysOfMonth.className = 'calendarati-days';
 
     var dayHeader = document.createElement('tr');
 
@@ -129,19 +126,20 @@ var calendarati = (function() {
       dayHeader.appendChild(theDay);
     });
 
-    days.appendChild(dayHeader);
+    daysOfMonth.appendChild(dayHeader);
 
-    while (date.getMonth() === month) {
+    // Loop through each day of a given month
+    while (dateBasedOnMonthYear.getMonth() === month) {
 
-      var theDate = new Date(date).getDate(),
-      currDay = new Date(date).getDay();
+      var theDate = new Date(dateBasedOnMonthYear).getDate(),
+      currDay = new Date(dateBasedOnMonthYear).getDay();
 
       // create a new row if it's the first of the month, or first day of the week
       if(theDate === 1 || currDay === 0) {
         dayRow = document.createElement('tr');
       }
 
-      var dateTmp = new Date(year, month, date.getDate() + 1) // Use dateTmp to store the next day for a conditional below
+      var dateTmp = new Date(year, month, dateBasedOnMonthYear.getDate() + 1) // Use dateTmp to store the next day for a conditional below
       // Pad the days before the first if the first of the month falls after the first day of the week
       if(theDate === 1 && currDay != 0) {
         for(var i = 0; i < currDay; i++) {
@@ -155,6 +153,20 @@ var calendarati = (function() {
       dayData.appendChild(document.createTextNode(theDate))
       dayData.id = 'calendarati-day-' + theDate;
       dayData.className = 'calendarati-day';
+
+      // Check if the day is the currently selected day
+      if(theDate === theCal.getCurrentDate().getDate() &&
+        dateBasedOnMonthYear.getMonth() === theCal.getCurrentDate().getMonth() &&
+        dateBasedOnMonthYear.getFullYear() === theCal.getCurrentDate().getFullYear()) {
+        // Remove currently active day
+        var currentlyActiveDate = document.querySelector('.active');
+        if(currentlyActiveDate) {
+          removeClass(currentlyActiveDate, 'active');
+        }
+
+        addClass(dayData, 'active');
+      }
+
       dayRow.appendChild(dayData);
 
       if(dateTmp.getMonth() !== month && currDay != 6) { // If it's the last day of the month pad the days after the end
@@ -166,28 +178,42 @@ var calendarati = (function() {
 
     // If this is the last day of the week, add the row to the table
     if(currDay === 6 || dateTmp.getMonth() !== month) {
-      days.appendChild(dayRow);
+      daysOfMonth.appendChild(dayRow);
     }
 
-    date.setDate(date.getDate() + 1);
+    dateBasedOnMonthYear.setDate(dateBasedOnMonthYear.getDate() + 1);
   }
 
-  return days;
+  return daysOfMonth;
 }
 
 theCal.cal = function(element) {
   var date = theCal.getCurrentDate();
-  setCurrentDate(date);
   element.className = 'calendarati group';
   element.innerHTML = buildDateSection(date);
   element.innerHTML += buildCalendar(date);
 
   var cal = document.querySelector('.calendarati');
   cal.addEventListener('click', eventDelegate);
+
+  document.onkeydown = function(event) {
+    event = event || window.event;
+
+    switch(event.keyCode) {
+      case 37: // Left
+        leftArrowMovement();
+        break;
+      case 39: // Right
+        rightArrowMovement();
+        break;
+      default:
+        break;
+    }
+  }
 }
 
 theCal.getCurrentDate = function() {
-  return theCal.date;
+  return theCal.currentDate;
 };
 
 return theCal;
@@ -202,6 +228,7 @@ function eventDelegate(event) {
       isArrow = arrowTest.test(target.classList[0]),
       component = isDays && 'day' || isArrow && 'arrow';
 
+  // Using delegate pattern to switch between handlers
   switch(component) {
     case 'day':
       daysHandler(target);
@@ -216,7 +243,7 @@ function eventDelegate(event) {
 }
 
 function setCurrentDate(_date) {
-  theCal.date = _date;
+  theCal.currentDate = _date;
 }
 
 function stopPropagation(event) {
@@ -231,30 +258,55 @@ function stopPropagation(event) {
  }
 }
 
+function rightArrowMovement() {
+  var theDate = tempDate;
+  theDate.setMonth(theDate.getMonth() +1);
+  var el = document.querySelector('.calendarati-right-section');
+  el.outerHTML = buildCalendar(theDate);
+}
+
+function leftArrowMovement() {
+  var theDate = tempDate;
+  theDate.setMonth(theDate.getMonth() -1);
+  var el = document.querySelector('.calendarati-right-section');
+  el.outerHTML = buildCalendar(theDate);
+}
+
+function removeClass(_element, _className) {
+  // TODO: Figure out why classReplace doesn't work but adding the regex hardcoded does??
+  var classReplace = new RegExp('/(?:^|\s)' + _className + '(?!\S)/g');
+  _element.className = _element.className.replace(/(?:^|\s)active(?!\S)/ , '' );
+}
+
+function addClass(_element, _className) {
+  _element.className += ' ' + _className;
+}
+
 // Event functions, delegated from eventDelegate
 function daysHandler(_target) {
-  var theDate = theCal.getCurrentDate();
+  var theDate = tempDate;
 
   var day = parseInt(_target.id.split('-')[2]);
   setCurrentDate(new Date(theDate.getFullYear(), theDate.getMonth(), day));
 
-  var el = document.querySelector('.calendarati');
-  theCal.cal(el);
+  // Remove currently active day
+  var currentlyActiveDate = document.querySelector('.active');
+  if(currentlyActiveDate) {
+    removeClass(currentlyActiveDate, 'active');
+  }
+
+  addClass(_target, 'active');
+
+  var el = document.querySelector('.calendarati-left-section');
+  el.outerHTML = buildDateSection(theCal.getCurrentDate())
 }
 
 function arrowHandler(_target) {
-  var theDate = theCal.getCurrentDate();
 
   if(/\w+-right-\w+/.test(_target.classList[0])) {
-    theDate.setMonth(theDate.getMonth() +1);
-    setCurrentDate(theDate);
-    var el = document.querySelector('.calendarati');
-    theCal.cal(el);
+    rightArrowMovement();
   } else {
-    theDate.setMonth(theDate.getMonth() -1);
-    setCurrentDate(theDate);
-    var el = document.querySelector('.calendarati');
-    theCal.cal(el);
+    leftArrowMovement();
   }
 }
 // End of event functions

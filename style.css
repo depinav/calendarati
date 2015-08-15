@@ -82,6 +82,10 @@ body {
   display: inline;
 }
 
+.active {
+  background-color: red;
+}
+
 .group:after {
   content: "";
   display: table;
